@@ -1,28 +1,26 @@
 #include <Python.h>
 
-static PyObject *DiypyInitError;
-
 PyDoc_STRVAR(diypy_doc,
     "Data-structure Interface Yourself using Python");
 
 static PyObject *
 diypy_bintree(PyObject *self, PyObject *args)
 {
-    const char *command;
-    int sts;
+    const char *greetings;
 
-    if (!PyArg_ParseTuple(args, "s", &command))
+    if (!PyArg_ParseTuple(args, "s", &greetings))
         return NULL;
-    sts = system(command);
-    if (sts < 0) {
-        PyErr_SetString(DiypyInitError, "binary tree initialization failed");
+    if (strlen(greetings) == 0) {
+        PyErr_SetString(PyExc_ValueError, "Cannot input an empty char");
         return NULL;
     }
-    return PyLong_FromLong(sts);
+    printf("Hello, %s!\n", greetings);
+    
+    Py_RETURN_NONE;
 }
 
-static PyMethodDef DiypyMethods[] = {
-    {"bintree", diypy_bintree, METH_VARARGS,
+static PyMethodDef diypy_methods[] = {
+    {"bintree", (PyCFunction)diypy_bintree, METH_VARARGS,
      "create and initialize a binary tree"},
     {NULL, NULL, 0, NULL} /* Sentinel value represents the end
                              of the method */
@@ -34,20 +32,11 @@ static struct PyModuleDef diypymodule = {
     diypy_doc,  /* module documentation */
     -1,         /* -1 means this module keeps state in global
                    variables. */
-    DiypyMethods
+    diypy_methods
 };
 
 PyMODINIT_FUNC
 PyInit_diypy(void)
 {
-    PyObject *m;
-
-    m = PyModule_Create(&diypymodule);
-    if (m == NULL)
-        return NULL;
-
-    DiypyInitError = PyErr_NewException("diypy.InitError", NULL, NULL);
-    Py_INCREF(DiypyInitError);
-    PyModule_AddObject(m, "InitError", DiypyInitError);
-    return m;
+    return PyModule_Create(&diypymodule);
 }

@@ -4,7 +4,7 @@
 from distutils.core import setup, Extension
 
 diypy = Extension('diypy', sources=['diypy/diypymodule.c'])
-with open('README', 'r') as filehandle:
+with open('README.md', 'r') as filehandle:
     long_description = filehandle.read()
 
 setup(name='diypy',
