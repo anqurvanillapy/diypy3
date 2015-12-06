@@ -3,15 +3,20 @@
 
 from distutils.core import setup, Extension
 
-diypy = Extension('diypy', sources=['diypy/diypymodule.c'])
-with open('README.md', 'r') as filehandle:
-    long_description = filehandle.read()
+_diypy = Extension('_diypy', sources=['diypy/ext/diypymodule.c'])
+description = 'Data-structure Interface Yourself using Python'
+try:
+    with open('README.md', 'r') as filehandle:
+        long_description = filehandle.read()
+except:
+    long_description = description
 
 setup(name='diypy',
       version='0.1',
-      description='Data-structure Interface Yourself using Python',
+      description=description,
       long_description=long_description,
       author='AnqurVanillapy',
       author_email='anqurvanillapy@gmail.com',
       url='https://github.com/anqurvanillapy/diypy',
-      ext_modules=[diypy])
+      packages=['diypy'],
+      ext_modules=[_diypy])
