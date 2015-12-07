@@ -32,8 +32,7 @@ class Diypy(object):
         be removed. A good formatted C string can be 'foo bar ', which
         will create a binary tree with 2 nodes.
 
-        The first flag defines the order of input and output data, which
-        includes:
+        The first flag defines the order of output data, which includes:
             PREORDER -- pre-order
             INORDER -- in-order
             POSTORDER -- post-order
@@ -50,5 +49,9 @@ class Diypy(object):
             if not node:
                 node = '0'
             bt_str += '{0} '.format(node)
+        _bt_str = bt_str.replace(' ', '')
+        nodes = len([n for n in _bt_str if n != '0'])
+        depth = len(_bt_str.split('0')[0])
 
+        print('nodes: {0} depth: {1}'.format(nodes, depth))
         _diypy._binary_tree(flag, bt_str)

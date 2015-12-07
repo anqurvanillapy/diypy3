@@ -2,16 +2,19 @@
  *  This module provides homemade data types for Python 3
  *  interpreter, including:
  *      - binary tree
+ *          + Threaded binary tree
  */
 
  #include "Python.h"
 
 /**
  *  Binary tree methods
- *      split_str(): -- replace the spaces in the level-order
+ *      split_str(): -- replaces the spaces in the pre-order
  *                      binary tree string with null characters
  *                      and use a pointer array to allocate every
  *                      string.
+ *      pre_order_create(): -- creates a binary tree by pre-order
+ *                             recursion
  *
  */
 
@@ -21,6 +24,7 @@ typedef struct binary_tree_node {
     struct binary_tree_node *right_child;
 } BTNODE, *BT;
 char **temp_rec;
+int indent = 0;
 
 void
 split_str(char *str, char **rec)
@@ -56,11 +60,18 @@ pre_order_create(BT *T)
 void
 pre_order_traverse(BT T)
 {
-    if (T == NULL)
+    if (T == NULL) {
         return;
-    printf("%s ", T->node_value);
-    pre_order_traverse(T->left_child);
-    pre_order_traverse(T->right_child);
+    } else {
+        int i;
+        for (i = 0; i < indent; i++)
+            putchar(' ');
+        printf("+ %s\n", T->node_value);
+        indent += 4;
+        pre_order_traverse(T->left_child);
+        pre_order_traverse(T->right_child);
+        indent -= 4;
+    }
 } // -- end: binary tree
 
 static PyObject *
@@ -75,14 +86,15 @@ _diypy__binary_tree(PyObject *self, PyObject *args)
         return NULL;
     split_str(bt_str, str_slice_rec);
     temp_rec = str_slice_rec;
+    pre_order_create(&T);
     switch (order) {
         case 0:
-            pre_order_create(&T);
             pre_order_traverse(T);
-            printf("\n");
+            indent = 0;
             break;
         default:
-            PyErr_SetString(PyExc_ValueError, "Unrecognised flag given");
+            PyErr_SetString(PyExc_ValueError,
+                            "Unrecognised flag given");
             return NULL;
     }
 
