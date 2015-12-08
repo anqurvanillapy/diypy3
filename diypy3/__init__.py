@@ -3,17 +3,17 @@
 
 """\
 This is a formatting module for input data and transfering to the C extension
-module _diypy.
+module _diypy3.
 
 Functions:
 
-binary_tree() -- format arguments for _diypy._binary_tree() function to create
+binary_tree() -- format arguments for _diypy3._binary_tree() function to create
                  and initialize a binary tree.
 """
 
-import _diypy
+import _diypy3
 
-class Diypy(object):
+class Diypy3(object):
 
     def __init__(self):
 
@@ -24,7 +24,7 @@ class Diypy(object):
     def binary_tree(self, flag, args):
 
         """Convert an args tuple or list to C string in specific format
-        to _diypy._binary_tree() function. User can only create a binary
+        to _diypy3._binary_tree() function. User can only create a binary
         tree with less than 1023 nodes, whose types of data can only be
         string.
 
@@ -54,4 +54,4 @@ class Diypy(object):
         depth = len(_bt_str.split('0')[0])
 
         print('nodes: {0} depth: {1}'.format(nodes, depth))
-        _diypy._binary_tree(flag, bt_str)
+        _diypy3._binary_tree(flag, bt_str)

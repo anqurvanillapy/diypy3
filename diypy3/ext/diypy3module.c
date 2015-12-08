@@ -75,7 +75,7 @@ pre_order_traverse(BT T)
 } // -- end: binary tree
 
 static PyObject *
-_diypy__binary_tree(PyObject *self, PyObject *args)
+_diypy3__binary_tree(PyObject *self, PyObject *args)
 {
     int order;
     char *bt_str;
@@ -101,27 +101,27 @@ _diypy__binary_tree(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR(_diypy_doc,
+PyDoc_STRVAR(_diypy3_doc,
     "Data-structure Interface Yourself using Python 3");
 
-static PyMethodDef _diypy_methods[] = {
-    {"_binary_tree", (PyCFunction)_diypy__binary_tree, METH_VARARGS,
+static PyMethodDef _diypy3_methods[] = {
+    {"_binary_tree", (PyCFunction)_diypy3__binary_tree, METH_VARARGS,
      "create and initialize a binary tree"},
     {NULL, NULL, 0, NULL} /* Sentinel value represents the end
                              of the method */
 };
 
-static struct PyModuleDef _diypymodule = {
+static struct PyModuleDef _diypy3module = {
     PyModuleDef_HEAD_INIT,
-    "_diypy",    /* module name */
-    _diypy_doc,  /* module documentation */
+    "_diypy3",    /* module name */
+    _diypy3_doc,  /* module documentation */
     -1,         /* -1 means this module keeps state in global
                    variables. */
-    _diypy_methods
+    _diypy3_methods
 };
 
 PyMODINIT_FUNC
-PyInit__diypy(void)
+PyInit__diypy3(void)
 {
-    return PyModule_Create(&_diypymodule);
+    return PyModule_Create(&_diypy3module);
 }
