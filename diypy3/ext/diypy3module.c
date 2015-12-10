@@ -10,8 +10,8 @@
  *          + threaded binary tree (TODO)
  *      - graph (TODO)
  *  Status code:
- *      0: -- OK, or true
- *      1: -- Error, or false
+ *       0: -- OK, or true
+ *       1: -- Error, or false
  *      -1: -- Infeasible
  *      -2: -- Overflow
  *  Public functions:
@@ -127,11 +127,11 @@ pop(ARRSTK *S, char **e)
 
 /**
  *  Link queue methods:
- *      init_queue(): -- 
- *      enqueue(): -- 
- *      show_queue(): --
- *      dequeue(): --
- *      destroy_queue(): --
+ *      init_queue(): -- create and init a linked list queue
+ *      enqueue(): -- enqueue and assign the value to the node
+ *      show_queue(): -- print the current status of the queue to stdout
+ *      dequeue(): -- dequeue and return the dequeued node value
+ *      destroy_queue(): -- destroy this queue
  */
 
 typedef struct link_queue_node {
@@ -173,8 +173,10 @@ show_queue(LNKQ Q)
 {
     do {
         Q.front = Q.front->next;
-        printf("%s\n", Q.front->node_value);
+        printf("%s, ", Q.front->node_value);
     } while (Q.front != Q.rear);
+
+    printf("\b\b  \n");
 }
 
 int
@@ -184,7 +186,7 @@ dequeue(LNKQ *Q, char **e)
         return 0;
 
     LNKQNODE *p = Q->front->next;
-    e = &(p->node_value);
+    *e = p->node_value;
     (Q->front)->next = p->next;
     if (Q->rear == p)
         Q->rear = Q->front;
@@ -273,6 +275,7 @@ _diypy3__array_stack(PyObject *self, PyObject *args)
     temp_rec = str_slice_rec;
     if (!init_stack(&S))
         return NULL;
+    printf("array stack initialized\n");
     printf("\n");
     for (i = 0; i < rec_size; i++) {
         printf("push: %s\n", temp_rec[i]);
@@ -298,6 +301,7 @@ _diypy3__link_queue(PyObject *self, PyObject *args)
     int rec_size;
     char *queue_str;
     char *str_slice_rec[1000];
+    char *deq;
     LNKQ Q;
 
     if (!PyArg_ParseTuple(args, "s", &queue_str))
@@ -306,9 +310,19 @@ _diypy3__link_queue(PyObject *self, PyObject *args)
     temp_rec = str_slice_rec;
     if (!init_queue(&Q))
         return NULL;
-    for (i = 0; i < rec_size; i++)
+    printf("linked list queue initialized\n");
+    printf("\n");
+    for (i = 0; i < rec_size; i++) {
+        printf("enqueue: %s\n", temp_rec[i]);
         enqueue(&Q, temp_rec[i]);
-    show_queue(Q);
+    }
+    while (Q.front != Q.rear) {
+        printf("\nstatus: ");
+        show_queue(Q);
+        dequeue(&Q, &deq);
+        printf("dequeue: %s\n", deq);
+    }
+    printf("\nwarning: empty queue\n");
 
     Py_RETURN_NONE;
 }
@@ -326,6 +340,7 @@ _diypy3__binary_tree(PyObject *self, PyObject *args)
     split_str(bt_str, str_slice_rec);
     temp_rec = str_slice_rec;
     pre_order_create(&T);
+    printf("binary tree initialized\n");
     switch (order) {
         case 0:
             pre_order_visualize(T);
