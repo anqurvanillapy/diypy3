@@ -17,6 +17,8 @@ import _diypy3
 
 class Diypy3(object):
 
+    """A formatting module for C extension module _diypy3"""
+
     def __init__(self):
 
         self.PREORDER = 0
@@ -25,17 +27,33 @@ class Diypy3(object):
 
     def check_args_type(self, args):
 
+        """Checkout whether the input args are valid. Only tuple and list
+        are required."""
+
         argtp = type(args).__name__
         if argtp not in ['list', 'tuple']:
             tperr = 'A list or tuple is required, not {0}'
             raise TypeError(tperr.format(argtp))
 
-    def array_stack(self, size, inc, args):
+    def formatter(self, args):
 
         """Convert an args tuple or list to C string in specific format
-        to _diypy3._array_stack() function. User can create a array
-        stack whose size can be customized, but types of data can only be
-        string.
+        to data structrue creation functions. User can create a data type
+        whose size can be customized, but types of data can only be string.
+        """
+
+        fmtstr = ''
+        for node in args:
+            node = str(node).replace(' ', '')
+            if not node:
+                node = '0'
+            fmtstr += '{0} '.format(node)
+
+        return fmtstr
+
+    def array_stack(self, size, inc, args):
+
+        """Create and initialize a stack implemented by array.
 
         A value in stack cannot be spaces, and spaces within a string will
         be removed. A good formatted C string can be 'foo bar ', which
@@ -46,32 +64,36 @@ class Diypy3(object):
         """
 
         self.check_args_type(args)
-
         intargs = (size, inc)
         for i in intargs:
             argtp = type(i).__name__
             if argtp != 'int':
                 tperr = 'An integer is required, not {0}'
                 raise TypeError(tperr.format(argtp))
-
-        arrstk_str = ''
-        for arg in args:
-            arg = str(arg).replace(' ', '')
-            if not arg:
-                arg = '0'
-            arrstk_str += '{0} '.format(arg)
-
+        arrstk_str = self.formatter(args)
         print('max size: {0}'.format(size))
         print('increment: {0}'.format(inc))
         print('stack size: {0}'.format(len(arrstk_str.split())))
         _diypy3._array_stack(size, inc, arrstk_str)
 
+    def link_queue(self, args):
+
+        """Create and initialize a linked list queue.
+
+        A value in queue cannot be spaces, and spaces within a string will
+        be removed. A good formatted C string can be 'foo bar ', which
+        will create a linked list queue with 2 values.
+        """
+
+        self.check_args_type(args)
+        lnkq_str = self.formatter(args)
+        print('nodes: {0}'.format(len(lnkq_str.split())))
+        _diypy3._link_queue(lnkq_str)
+
     def binary_tree(self, flag, args):
 
-        """Convert an args tuple or list to C string in specific format
-        to _diypy3._binary_tree() function. User can only create a binary
-        tree with less than 1023 nodes, whose types of data can only be
-        string.
+        """Create and initialize a binary tree. The values of the binary
+        tree should be input in pre-order.
 
         A node value cannot be spaces, and spaces within a string will
         be removed. A good formatted C string can be 'foo bar ', which
@@ -84,17 +106,9 @@ class Diypy3(object):
         """
 
         self.check_args_type(args)
-
-        bt_str = ''
-        for node in args:
-            node = str(node).replace(' ', '')
-            if not node:
-                node = '0'
-            bt_str += '{0} '.format(node)
-
+        bt_str = self.formatter(args)
         nodes = len([n for n in bt_str.split() if n != '0'])
         depth = len(bt_str.split('0')[0].split())
-
         print('nodes: {0}'.format(nodes))
         print('depth: {0}'.format(depth))
         _diypy3._binary_tree(flag, bt_str)
