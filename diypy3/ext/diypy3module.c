@@ -7,7 +7,8 @@
  *          + linked list implementation
  *      - matrix
  *          + triplet sparse matrix
- *      - binary tree
+ *      - tree
+ *          + binary tree
  *          + threaded binary tree (TODO)
  *      - graph (TODO)
  *  Status code:
@@ -215,7 +216,9 @@ destroy_queue(LNKQ *Q)
 
 /**
  *  Triplet sparse matrix methods:
- *
+ *      create_sparse_trismx(): -- create a triplet sparse matrix
+ *      fast_transpose_trismx(): -- fast version of matrix transposing
+ *      visualize_trismx(): -- print the matrix on the stdout
  */
 
 typedef struct triplet_sparse_matrix_unit {
@@ -300,7 +303,7 @@ visualize_trismx(TRISMX *M)
         printf("%d\t%d\t%s\n", M->data[p].i,
                                M->data[p].j,
                                M->data[p].unit_value);
-}
+} // -- end: triplet sparse matrix
 
 /**
  *  Binary tree methods:
@@ -353,6 +356,7 @@ pre_order_visualize(BTNODE *T)
 
 /**
  *  Graph methods:
+ *      
  */
 
 static PyObject *

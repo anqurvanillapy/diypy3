@@ -4,13 +4,6 @@
 """\
 This is a formatting module for input data and transfering to the C extension
 module _diypy3.
-
-Functions:
-
-array_stack() -- format arguments for _diypy3._array_stack() function to create
-                 and initialize an array stack.
-binary_tree() -- format arguments for _diypy3._binary_tree() function to create
-                 and initialize a binary tree.
 """
 
 import _diypy3
