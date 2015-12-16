@@ -3,9 +3,10 @@
  *  interpreter, including:
  *      - stack
  *          + array implementation
- *          + linked list implementation (TODO)
  *      - queue
  *          + linked list implementation
+ *      - matrix
+ *          + triplet sparse matrix
  *      - binary tree
  *          + threaded binary tree (TODO)
  *      - graph (TODO)
@@ -22,6 +23,11 @@
  */
 
  #include "Python.h"
+
+#define ARRSTK_MAXSIZE 1000
+#define LNKQ_MAXSIZE 1000
+#define TRISMX_MAXSIZE 12500
+#define BT_MAXSIZE 1023
 
 char **temp_rec;
 
@@ -208,6 +214,89 @@ destroy_queue(LNKQ *Q)
 } // -- end: link queue
 
 /**
+ *  Triplet sparse matrix methods:
+ *
+ */
+
+typedef struct triplet_sparse_matrix_unit {
+    int i;  // row
+    int j;  // column
+    char *unit_value;
+} UNIT;
+
+typedef struct triplet_sparse_matrix {
+    UNIT data[TRISMX_MAXSIZE + 1];
+    int mu, nu, tu; // rows, columns, and non-zeros
+} TRISMX;
+
+int
+create_sparse_trismx(TRISMX *M, int mu, int nu, int tu)
+{
+    int k;
+    int rec_index = 0;
+
+    M->mu = mu;
+    M->nu = nu;
+    M->tu = tu;
+    for (k = 1; k <= M->tu; k++) {
+        sscanf(temp_rec[rec_index], "%d", &(M->data[k].i));
+        sscanf(temp_rec[rec_index + 1], "%d", &(M->data[k].j));
+        M->data[k].unit_value = temp_rec[rec_index + 2];
+        printf("%d, %d, %s\n", M->data[k].i, M->data[k].j, M->data[k].unit_value);
+        rec_index += 3;
+        if (M->data[k].i > mu || M->data[k].j > nu || M->data[k].unit_value == 0)
+            return 0;
+        if (M->data[k].i <= 0 || M->data[k].j <= 0)
+            return 0;
+    }
+
+    return 1;
+}
+
+int
+fast_transpose_trismx(TRISMX *M, TRISMX *N)
+{
+    int p, q;
+    int col;
+    int num[M->nu + 1];
+    int cpot[M->nu + 1];
+
+    N->mu = M->mu;
+    N->nu = M->nu;
+    N->tu = M->tu;
+    if (N->tu) {
+        for (col = 1; col <= M->nu; col++)
+            num[col] = 0;
+        for (p = 1; p <= M->tu; p++)
+            num[M->data[p].j]++;
+        cpot[1] = 1;
+        for (col = 2; col <= M->nu; col++)
+            cpot[col] = cpot[p - 1] + num[p - 1];
+        for (p = 1; p <= M->tu; p++) {
+            col = M->data[p].j;
+            q = cpot[col];
+            N->data[q].i = M->data[p].j;
+            N->data[q].j = M->data[p].i;
+            N->data[q].unit_value = M->data[p].unit_value;
+            cpot[col]++;
+        }
+    }
+
+    return 1;
+}
+
+void
+visualize_trismx(TRISMX *M)
+{
+    int p;
+
+    for (p = 1; p <= M->tu; p++)
+        printf("%d\t%d\t%s\n", M->data[p].i,
+                               M->data[p].j,
+                               M->data[p].unit_value);
+}
+
+/**
  *  Binary tree methods:
  *      pre_order_create(): -- creates a binary tree by pre-order
  *                             recursion.
@@ -256,13 +345,17 @@ pre_order_visualize(BTNODE *T)
     }
 } // -- end: binary tree
 
+/**
+ *  Graph methods:
+ */
+
 static PyObject *
 _diypy3__array_stack(PyObject *self, PyObject *args)
 {
     int i;
     int rec_size;
     char *stack_str;
-    char *str_slice_rec[1000];
+    char *str_slice_rec[ARRSTK_MAXSIZE];
     char *topelem, *popelem;
     ARRSTK S;
 
@@ -300,7 +393,7 @@ _diypy3__link_queue(PyObject *self, PyObject *args)
     int i;
     int rec_size;
     char *queue_str;
-    char *str_slice_rec[1000];
+    char *str_slice_rec[LNKQ_MAXSIZE];
     char *deq;
     LNKQ Q;
 
@@ -328,11 +421,39 @@ _diypy3__link_queue(PyObject *self, PyObject *args)
 }
 
 static PyObject *
+_diypy3__triplet_matrix(PyObject *self, PyObject *args)
+{
+    int mu;
+    int nu;
+    int tu;
+    char *trismx_str;
+    char *str_slice_rec[TRISMX_MAXSIZE];
+    TRISMX M;
+    TRISMX N;
+
+    if (!PyArg_ParseTuple(args, "iiis", &mu,
+                                        &nu,
+                                        &tu,
+                                        &trismx_str))
+        return NULL;
+    split_str(trismx_str, str_slice_rec);
+    temp_rec = str_slice_rec;
+    create_sparse_trismx(&M, mu, nu, tu);
+    printf("triplet sparse matrix initialized\n");
+    visualize_trismx(&M);
+    printf("fast transpose this matrix:\n");
+    fast_transpose_trismx(&M, &N);
+    visualize_trismx(&M);
+
+    Py_RETURN_NONE;
+}
+
+static PyObject *
 _diypy3__binary_tree(PyObject *self, PyObject *args)
 {
     int order;
     char *bt_str;
-    char *str_slice_rec[1023];
+    char *str_slice_rec[BT_MAXSIZE];
     BTNODE *T;
 
     if (!PyArg_ParseTuple(args, "is", &order, &bt_str))
@@ -360,6 +481,8 @@ static PyMethodDef _diypy3_methods[] = {
      "create and initialize an array-implemented stack and make some actions"},
     {"_link_queue", (PyCFunction)_diypy3__link_queue, METH_VARARGS,
      "create and initialize a queue implemented by a linked list and test some methods"},
+    {"_triplet_sparse_matrix", (PyCFunction)_diypy3__triplet_matrix, METH_VARARGS,
+     "create and initialize a triplet matrix and test tranposing method"},
     {"_binary_tree", (PyCFunction)_diypy3__binary_tree, METH_VARARGS,
      "create and initialize a binary tree"},
     {NULL, NULL, 0, NULL} /* Sentinel value represents the end

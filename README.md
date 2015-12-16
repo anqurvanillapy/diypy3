@@ -17,7 +17,7 @@ Requirements
 ------------
 
 - `Python 3.4.x` or higher versions
-- `Graphviz (DOT)` for visualizing *graphs*
+- `Graphviz Dot` for visualizing *graphs*
 
 Installation
 ------------
@@ -41,6 +41,9 @@ d = diypy3.Diypy3()
 # create a stack with array implementation and pop it,
 # 100 for stack max size and 10 for stack pushing increment if oversized
 d.array_stack(100, 10, [1, 2, 3, 4, 5])
+
+# create a linked list queue and test enqueuing and dequeuing
+d.link_queue([1, 2, 3, 4, 5])
 
 # create a binary tree and traverse in pre-order
 d.binary_tree(d.PREORDER, [1, 2, 3, 0, 0, 4, 0, 0, 0])

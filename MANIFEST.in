@@ -2,5 +2,8 @@ include setup.py
 include LICENSE
 include MANIFEST.in
 include README.md
+include diypy3/graphs.py
 
 graft diypy3
+graft diypy3/ext
+graft diypy3/res

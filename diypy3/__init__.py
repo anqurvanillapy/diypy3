@@ -7,17 +7,18 @@ module _diypy3.
 
 Functions:
 
-binary_tree() -- format arguments for _diypy3._binary_tree() function to create
-                 and initialize a binary tree.
 array_stack() -- format arguments for _diypy3._array_stack() function to create
                  and initialize an array stack.
+binary_tree() -- format arguments for _diypy3._binary_tree() function to create
+                 and initialize a binary tree.
 """
 
 import _diypy3
+# import graphs
 
 class Diypy3(object):
 
-    """A formatting module for C extension module _diypy3"""
+    """A formatter module for C extension module _diypy3"""
 
     def __init__(self):
 
@@ -25,15 +26,18 @@ class Diypy3(object):
         self.INORDER = 1
         self.POSTORDER = 2
 
-    def check_args_type(self, args):
+    def check_args_type(self, args, tps=['list', 'tuple']):
 
         """Checkout whether the input args are valid. Only tuple and list
         are required."""
 
         argtp = type(args).__name__
-        if argtp not in ['list', 'tuple']:
-            tperr = 'A list or tuple is required, not {0}'
-            raise TypeError(tperr.format(argtp))
+        if argtp not in tps:
+            errmsg = "required argument types:\n"
+            for tp in tps:
+                errmsg += "  '{0}'\n".format(tp)
+            errmsg += "invalid argument types: '{0}'".format(argtp)
+            raise TypeError(errmsg)
 
     def formatter(self, args):
 
@@ -76,7 +80,7 @@ class Diypy3(object):
         print('stack size: {0}'.format(len(arrstk_str.split())))
         _diypy3._array_stack(size, inc, arrstk_str)
 
-    def link_queue(self, args):
+    def link_queue(self, *args):
 
         """Create and initialize a linked list queue.
 
@@ -90,13 +94,46 @@ class Diypy3(object):
         print('nodes: {0}'.format(len(lnkq_str.split())))
         _diypy3._link_queue(lnkq_str)
 
+    def triplet_sparse_matrix(self, *args):
+
+        """Create and initialize a triplet matrix, and testing its
+        transposing methods.
+
+        A unit value cannot be spaces, and spaces within a string will
+        be removed. A good formatted C string can be '0 0 foo', which
+        will create a triplet matrix with one unit.
+        """
+
+        trismx_str = ''
+        mnt = [0, 0, 0]
+        for unit in args:
+            self.check_args_type(unit)
+            unitlen = len(unit)
+            if unitlen != 3:
+                errmsg = 'A unit should contain 3 attributes, not {0}'
+                raise AttributeError(errmsg.format(unitlen))
+            unit_str = self.formatter(unit)
+            if unit_str.split()[2] != '0':
+                for i in range(2):
+                    self.check_args_type(unit[i], tps=['int'])
+                    mnt[i] = max(unit[i], mnt[i])
+                mnt[2] += 1
+                trismx_str += unit_str
+        if not trismx_str:
+            raise ValueError('cannot create empty matrix')
+        print(mnt[0] + 1, mnt[1] + 1, mnt[2], trismx_str)
+        _diypy3._triplet_sparse_matrix(mnt[0] + 1,
+                                       mnt[1] + 1,
+                                       mnt[2],
+                                       trismx_str)
+
     def binary_tree(self, flag, args):
 
         """Create and initialize a binary tree. The values of the binary
         tree should be input in pre-order.
 
         A node value cannot be spaces, and spaces within a string will
-        be removed. A good formatted C string can be 'foo bar ', which
+        be removed. A good formatted C string can be 'foo bar 0 0 0', which
         will create a binary tree with 2 nodes.
 
         The first flag defines the order of output data, which includes:
@@ -112,3 +149,11 @@ class Diypy3(object):
         print('nodes: {0}'.format(nodes))
         print('depth: {0}'.format(depth))
         _diypy3._binary_tree(flag, bt_str)
+
+    def graphs(self, imgfmt):
+
+        g = graphs.generate_graph_img(imgfmt)
+
+if __name__ == '__main__':
+    d = Diypy3()
+    d.graphs('png')
