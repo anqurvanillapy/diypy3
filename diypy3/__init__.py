@@ -121,9 +121,11 @@ class Diypy3(object):
                 trismx_str += unit_str
         if not trismx_str:
             raise ValueError('cannot create empty matrix')
-        print(mnt[0] + 1, mnt[1] + 1, mnt[2], trismx_str)
-        _diypy3._triplet_sparse_matrix(mnt[0] + 1,
-                                       mnt[1] + 1,
+        print('rows:', mnt[0])
+        print('columns:', mnt[1])
+        print('valid:', mnt[2])
+        _diypy3._triplet_sparse_matrix(mnt[0],
+                                       mnt[1],
                                        mnt[2],
                                        trismx_str)
 

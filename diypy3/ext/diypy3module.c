@@ -242,7 +242,6 @@ create_sparse_trismx(TRISMX *M, int mu, int nu, int tu)
         sscanf(temp_rec[rec_index], "%d", &(M->data[k].i));
         sscanf(temp_rec[rec_index + 1], "%d", &(M->data[k].j));
         M->data[k].unit_value = temp_rec[rec_index + 2];
-        printf("%d, %d, %s\n", M->data[k].i, M->data[k].j, M->data[k].unit_value);
         rec_index += 3;
         if (M->data[k].i > mu || M->data[k].j > nu || M->data[k].unit_value == 0)
             return 0;
@@ -256,22 +255,29 @@ create_sparse_trismx(TRISMX *M, int mu, int nu, int tu)
 int
 fast_transpose_trismx(TRISMX *M, TRISMX *N)
 {
-    int p, q;
     int col;
-    int num[M->nu + 1];
-    int cpot[M->nu + 1];
+    int t;
+    int p, q;
+    int *num;
+    int *cpot;
 
-    N->mu = M->mu;
-    N->nu = M->nu;
+    num = (int *)malloc((M->nu + 1) * sizeof(int));
+    if (!num)
+        return -2;
+    cpot = (int *)malloc((M->nu + 1)* sizeof(int));
+    if (!cpot)
+        return -2;
+    N->mu = M->nu;
+    N->nu = M->mu;
     N->tu = M->tu;
     if (N->tu) {
         for (col = 1; col <= M->nu; col++)
             num[col] = 0;
-        for (p = 1; p <= M->tu; p++)
-            num[M->data[p].j]++;
+        for (t = 1; t <= M->tu; t++)
+            num[M->data[t].j]++;
         cpot[1] = 1;
         for (col = 2; col <= M->nu; col++)
-            cpot[col] = cpot[p - 1] + num[p - 1];
+            cpot[col] = cpot[col - 1] + num[col - 1];
         for (p = 1; p <= M->tu; p++) {
             col = M->data[p].j;
             q = cpot[col];
@@ -421,7 +427,7 @@ _diypy3__link_queue(PyObject *self, PyObject *args)
 }
 
 static PyObject *
-_diypy3__triplet_matrix(PyObject *self, PyObject *args)
+_diypy3__triplet_sparse_matrix(PyObject *self, PyObject *args)
 {
     int mu;
     int nu;
@@ -443,7 +449,7 @@ _diypy3__triplet_matrix(PyObject *self, PyObject *args)
     visualize_trismx(&M);
     printf("fast transpose this matrix:\n");
     fast_transpose_trismx(&M, &N);
-    visualize_trismx(&M);
+    visualize_trismx(&N);
 
     Py_RETURN_NONE;
 }
@@ -481,7 +487,7 @@ static PyMethodDef _diypy3_methods[] = {
      "create and initialize an array-implemented stack and make some actions"},
     {"_link_queue", (PyCFunction)_diypy3__link_queue, METH_VARARGS,
      "create and initialize a queue implemented by a linked list and test some methods"},
-    {"_triplet_sparse_matrix", (PyCFunction)_diypy3__triplet_matrix, METH_VARARGS,
+    {"_triplet_sparse_matrix", (PyCFunction)_diypy3__triplet_sparse_matrix, METH_VARARGS,
      "create and initialize a triplet matrix and test tranposing method"},
     {"_binary_tree", (PyCFunction)_diypy3__binary_tree, METH_VARARGS,
      "create and initialize a binary tree"},
